@@ -10,8 +10,8 @@ import "./APRedemption.sol";
 
 contract HarvestAP is ERC20, Ownable {
 
-    address public redemption;
-
+    APRedemption public redemption;
+    IERC20 immutable public farm;
     // Arguments are:
     //  owner_ - who can mint
     //  farm_ - the FARM token that is distributed by the redemption
@@ -20,12 +20,18 @@ contract HarvestAP is ERC20, Ownable {
         Ownable()
     {
         transferOwnership(owner_);
-        redemption = address(new APRedemption(farm_));
+        farm = IERC20(farm_);
+        redemption = new APRedemption(farm_);
     }
 
     // In case we ever want to change redemption logic
     function setRedemption(address redemption_) external onlyOwner {
-        redemption = redemption_;
+        // sweep farm tokens to new address
+        redemption.sweep();
+        farm.transfer(redemption_, farm.balanceOf(address(this)));
+
+        // set new address
+        redemption = APRedemption(redemption_);
     }
 
     // Make new AP
@@ -38,7 +44,7 @@ contract HarvestAP is ERC20, Ownable {
     // We do this so we can skip `approve` steps during redemption
     function redeem(address account_, uint256 amount_) external {
         require(
-            msg.sender == redemption,
+            msg.sender == address(redemption),
             "HarvestAP/redeem - This function may only be called by APRedemption"
         );
         require(balanceOf(account_) >= amount_, "HarvestAP/redeem - Insufficient balance");

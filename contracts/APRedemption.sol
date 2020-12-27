@@ -46,4 +46,10 @@ contract APRedemption {
     function redeem(uint256 toRedeem_) external returns (uint256) {
         return redeemTo(toRedeem_, msg.sender);
     }
+
+    // Allow the AP to sweep farm from the redemption contract
+    function sweep() external returns (uint256) {
+        require(msg.sender == address(ap), "APRedemption/sweep - only AP Token may call");
+        farm.transfer(address(ap), farmBalance());
+    }
 }
