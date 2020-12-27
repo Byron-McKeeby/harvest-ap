@@ -10,8 +10,9 @@ import "./APRedemption.sol";
 
 contract HarvestAP is ERC20, Ownable {
 
-    APRedemption public redemption;
+    APRedemptionI public redemption;
     IERC20 immutable public farm;
+
     // Arguments are:
     //  owner_ - who can mint
     //  farm_ - the FARM token that is distributed by the redemption
@@ -21,7 +22,7 @@ contract HarvestAP is ERC20, Ownable {
     {
         transferOwnership(owner_);
         farm = IERC20(farm_);
-        redemption = new APRedemption(farm_);
+        redemption = APRedemptionI(new APRedemption(farm_));
     }
 
     // In case we ever want to change redemption logic
@@ -31,7 +32,7 @@ contract HarvestAP is ERC20, Ownable {
         farm.transfer(redemption_, farm.balanceOf(address(this)));
 
         // set new address
-        redemption = APRedemption(redemption_);
+        redemption = APRedemptionI(redemption_);
     }
 
     // Make new AP

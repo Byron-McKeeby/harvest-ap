@@ -7,8 +7,14 @@ import "@openzeppelin/contracts/math/SafeMath.sol";
 
 import "./HarvestAP.sol";
 
+interface APRedemptionI {
+    function sweep() external returns (uint256);
+    function redeem(uint256 toRedeem_) external returns (uint256);
+    function redeemTo(uint256 toRedeem_, address recipient_) external returns (uint256);
+}
+
 /// Should be deployed by the harvest AP.
-contract APRedemption {
+contract APRedemption is APRedemptionI {
     using SafeMath for uint256;
 
     // we know FARM is correctly implemented, so no need for SafeERC20
@@ -32,7 +38,7 @@ contract APRedemption {
     }
 
     // redeem tokens and transfer farm to recipient
-    function redeemTo(uint256 toRedeem_, address recipient_) public returns (uint256) {
+    function redeemTo(uint256 toRedeem_, address recipient_) public override returns (uint256) {
         // this calculation must be done before redeeming
         uint256 farmAmnt_ = calcRedemption(toRedeem_);
 
@@ -43,12 +49,12 @@ contract APRedemption {
     }
 
     // shortcut for redeem to self
-    function redeem(uint256 toRedeem_) external returns (uint256) {
+    function redeem(uint256 toRedeem_) external override returns (uint256) {
         return redeemTo(toRedeem_, msg.sender);
     }
 
     // Allow the AP to sweep farm from the redemption contract
-    function sweep() external returns (uint256) {
+    function sweep() external override returns (uint256) {
         require(msg.sender == address(ap), "APRedemption/sweep - only AP Token may call");
         farm.transfer(address(ap), farmBalance());
     }
