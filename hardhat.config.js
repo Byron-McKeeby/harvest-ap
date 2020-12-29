@@ -1,5 +1,11 @@
 require("@nomiclabs/hardhat-solhint");
 require("@nomiclabs/hardhat-waffle");
+require("@nomiclabs/hardhat-etherscan");
+require("hardhat-gas-reporter");
+
+require('dotenv').config();
+
+let apiKey = process.env.ETHERSCAN_KEY;
 
 // This is a sample Hardhat task. To learn how to create your own go to
 // https://hardhat.org/guides/create-task.html
@@ -11,12 +17,15 @@ task("accounts", "Prints the list of accounts", async () => {
   }
 });
 
-// You need to export an object to set up your config
-// Go to https://hardhat.org/config/ to learn more
-
 /**
  * @type import('hardhat/config').HardhatUserConfig
  */
 module.exports = {
   solidity: "0.7.3",
+  localhost: {
+    url: "http://127.0.0.1:8545",
+  },
+  etherscan: {
+    apiKey,
+  },
 };

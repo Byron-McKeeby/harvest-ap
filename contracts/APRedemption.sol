@@ -19,7 +19,7 @@ contract APRedemption is APRedemptionI {
 
     // we know FARM is correctly implemented, so no need for SafeERC20
     IERC20 immutable public farm;
-    HarvestAP immutable public ap;
+    HarvestAP public ap;
 
     // Arg is the address of the FARM token to be distributed
     // - Future versions must set AP in the constructor
